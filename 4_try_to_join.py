@@ -31,11 +31,11 @@ def are_close(pdb, chains):
         beg_coords, end_coords = get_chain_ends(pdb, chain)
         begs[chain] = beg_coords
         ends[chain] = end_coords
-    for chain1 in chains:
-        for chain2 in chains:
+    for end_chain in chains:
+        for beg_chain in chains:
             if chain1 == chain2: continue
-            if calc_dist(ends[chain1], begs[chain2]) < 4:
-                close.append((chain1, chain2))
+            if calc_dist(ends[end_chain], begs[beg_chain]) < 4:
+                close.append((end_chain, beg_chain))
     for close1 in close:
         for close2 in close:
             if close1 == close2: continue
@@ -43,12 +43,25 @@ def are_close(pdb, chains):
             assert set.intersection(set(close1), set(close2)) == set()
     return close
 
+def join_xyz(close_chains):
+    pdb, (end_chain, beg_chain) = close_chains
+    with open('xyz/{}_{}.xyz'.format(pdb, end_chain), 'r') as f:
+        first_file = f.readlines()
+    with open('xyz/{}_{}.xyz'.format(pdb, beg_chain), 'r') as f:
+        second_file = f.readlines()
+    output_file = 'xyz/{}_{}-{}.xyz'.format(pdb, end_chain, beg_chain)
+    with open(output_file, 'w') as f:
+        f.write(first_file + second_file)
+        print('{} created'.format(output_file))
+
 if __name__ == '__main__':
     pdb_chains_list = get_chains_to_analyze()
     close_chains = []
     for pdb, chains in pdb_chains_list:
         close = are_close(pdb, chains)
         if close:
-            close_chains.append([pdb, close])
-    print(close_chains)
+            for c in close:
+                close_chains.append([pdb, c])
+    for close_chain in close_chains:
+        join_xyz(close_chains)
 
