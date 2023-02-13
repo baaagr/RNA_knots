@@ -40,7 +40,7 @@ def are_close(pdb, chains):
         for close2 in close:
             if close1 == close2: continue
             # assuming maximally two chains are near each other
-            assert set(close1) && set(close2) == set()
+            assert set.intersection(set(close1), set(close2)) == set()
     return close
 
 if __name__ == '__main__':
