@@ -36,8 +36,11 @@ def are_close(pdb, chains):
             if chain1 == chain2: continue
             if calc_dist(ends[chain1], begs[chain2]) < 4:
                 close.append((chain1, chain2))
-
-
+    for close1 in close:
+        for close2 in close:
+            if close1 == close2: continue
+            # assuming maximally two chains are near each other
+            assert set(close1) && set(close2) == set()
     return close
 
 if __name__ == '__main__':
