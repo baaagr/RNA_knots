@@ -66,23 +66,6 @@ class Analyze(object):
         with open('max_dists.txt', 'a+') as f:
             for chain, dist in self.max_dists.items():
                 f.write('{}_{} {:.2f}\n'.format(self.pdb, chain, dist))
-"""
-    def are_close():
-        begs = {}
-        ends = {}
-        close = []
-        for chain in self.corr_chains:
-            label1, beg_coords = self.records[corr_chain][0]
-            label2, end_coords = self.records[corr_chain][-1]
-            begs[chain] = beg_coords
-            ends[chain] = end_coords
-        for chain1 in self.corr_chains:
-            for chain2 in self.corr_chains:
-                if chain1 == chain2: continue
-                if self.calc_dist(ends[chain1], begs[chain2]) < 4:
-                    close.append((chain1, chain2))
-        return close
-"""
 
 def analyze():
     with open('max_dists.txt', 'w') as f:

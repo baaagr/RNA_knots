@@ -1,19 +1,49 @@
+import numpy as np
 
-
-def calc_dist(new_coords, old_coords):                                       
-    dist = np.sqrt(np.sum(np.power(new_coords-old_coords,2)))                
-    return dist   
+def calc_dist(new_coords, old_coords):
+    dist = np.sqrt(np.sum(np.power(new_coords-old_coords,2)))
+    return dist
 
 def get_chains_to_analyze():
-    pdb_chain_dict = {}
+    pdb_chains = []
     with open('lists/eq_classes.txt', 'r') as f:
         for line in f.readlines():
             eq_class, pdb, chains = line.strip().split()
             chains = chains.split(',')
             if len(chains) > 1:
-                pdb_chain_dict[pdb] = chains
-    return pdb_chain_dict
+                pdb_chains.append([pdb,chains])
+    return pdb_chain
+
+def get_chain_ends(pdb, chain):
+    with open('xyz/{}_{}.xyz'.format(pdb,chain), 'r') as f:
+        first_line, *_, last_line = f.readlines()
+    ndx1, x1, y1, z1 = first_line.strip().split()
+    ndx2, x2, y2, z2 = last_line.strip().split()
+    beg_coords = np.array([float(k) for k in [x1, y1, z1]])
+    end_coords = np.array([float(k) for k in [x2, y2, z2]])
+    return beg_coords, end_coords
+
+def are_close(pdb, chains):
+    begs = {}
+    ends = {}
+    close = []
+    for chain in chains:
+        beg_coords, end_coords = get_chain_ends(pdb, chain)
+        begs[chain] = beg_coords
+        ends[chain] = end_coords
+    for chain1 in self.corr_chains:
+        for chain2 in self.corr_chains:
+            if chain1 == chain2: continue
+            if self.calc_dist(ends[chain1], begs[chain2]) < 4:
+                close.append((chain1, chain2))
+    return close
 
 if __name__ == '__main__':
-    print(get_chains_to_analyze())
-        
+    pdb_chains_list = get_chains_to_analyze()
+    close_chains = []
+    for pdb, chains for pdb_chains_list:
+        close = are_close(pdb, chains)
+        if close:
+            close_chains.append(close)
+    print(close_chains)
+
