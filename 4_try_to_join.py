@@ -12,7 +12,7 @@ def get_chains_to_analyze():
             chains = chains.split(',')
             if len(chains) > 1:
                 pdb_chains.append([pdb,chains])
-    return pdb_chain
+    return pdb_chains
 
 def get_chain_ends(pdb, chain):
     with open('xyz/{}_{}.xyz'.format(pdb,chain), 'r') as f:
@@ -31,19 +31,21 @@ def are_close(pdb, chains):
         beg_coords, end_coords = get_chain_ends(pdb, chain)
         begs[chain] = beg_coords
         ends[chain] = end_coords
-    for chain1 in self.corr_chains:
-        for chain2 in self.corr_chains:
+    for chain1 in chains:
+        for chain2 in chains:
             if chain1 == chain2: continue
-            if self.calc_dist(ends[chain1], begs[chain2]) < 4:
+            if calc_dist(ends[chain1], begs[chain2]) < 4:
                 close.append((chain1, chain2))
+
+
     return close
 
 if __name__ == '__main__':
     pdb_chains_list = get_chains_to_analyze()
     close_chains = []
-    for pdb, chains for pdb_chains_list:
+    for pdb, chains in pdb_chains_list:
         close = are_close(pdb, chains)
         if close:
-            close_chains.append(close)
+            close_chains.append([pdb, close])
     print(close_chains)
 
