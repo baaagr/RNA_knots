@@ -33,7 +33,7 @@ def are_close(pdb, chains):
         ends[chain] = end_coords
     for end_chain in chains:
         for beg_chain in chains:
-            if chain1 == chain2: continue
+            if beg_chain == end_chain: continue
             if calc_dist(ends[end_chain], begs[beg_chain]) < 4:
                 close.append((end_chain, beg_chain))
     for close1 in close:
@@ -45,13 +45,21 @@ def are_close(pdb, chains):
 
 def join_xyz(close_chains):
     pdb, (end_chain, beg_chain) = close_chains
+    lines = []
+    i = 0
     with open('xyz/{}_{}.xyz'.format(pdb, end_chain), 'r') as f:
-        first_file = f.readlines()
+        for line in f.readlines():
+            i += 1
+            ndx, x, y, z = line.strip().split()
+            lines.append('{:d} {} {} {}'.format(i, x, y, z))
     with open('xyz/{}_{}.xyz'.format(pdb, beg_chain), 'r') as f:
-        second_file = f.readlines()
+        for line in f.readlines():
+            i += 1
+            ndx, x, y, z = line.strip().split()
+            lines.append('{:d} {} {} {}'.format(i, x, y, z))
     output_file = 'xyz/{}_{}-{}.xyz'.format(pdb, end_chain, beg_chain)
     with open(output_file, 'w') as f:
-        f.write(first_file + second_file)
+        f.write('\n'.join(lines))
         print('{} created'.format(output_file))
 
 if __name__ == '__main__':
@@ -62,6 +70,7 @@ if __name__ == '__main__':
         if close:
             for c in close:
                 close_chains.append([pdb, c])
+    print(close_chains)
     for close_chain in close_chains:
-        join_xyz(close_chains)
+        join_xyz(close_chain)
 
