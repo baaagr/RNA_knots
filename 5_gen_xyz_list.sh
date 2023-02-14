@@ -1,3 +1,5 @@
 #!/bin/bash
 
-ls -l xyz/ | awk '{if ($9!="") print $9}' > lists/xyz_files.txt
+# generate list of xyz files sorted by file sizes
+ls -l xyz/ | awk '{if ($9!="") print $5,$9}' | sort -n | awk '{print $2}' > lists/xyz_files.txt
+
