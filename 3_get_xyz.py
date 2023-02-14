@@ -15,6 +15,8 @@ class Analyze(object):
 
     @staticmethod
     def calc_dist(new_coords, old_coords):
+        if None in old_coords:
+            return None
         dist = np.sqrt(np.sum(np.power(new_coords-old_coords,2)))
         return dist
 
@@ -37,15 +39,22 @@ class Analyze(object):
                     if not chain_id in records.keys():
                         records[chain_id] = []
                         max_dists[chain_id] = 0
-                        old_coords = np.array([float(k) for k in [x,y,z]])
+                        old_coords = np.array([None, None, None])
+                        old_resid_id = None
+                        old_atom_type = None
+                    if (old_resid_id, old_atom_type) == (resid_id, atom_type): continue
                     label = '-'.join([atom_id, chain_id, resid_id, atom_type])
                     coords = np.array([float(k) for k in [x,y,z]])
                     dist = self.calc_dist(coords, old_coords)
-                    if dist > max_dists[chain_id]:
+                    if dist == None: dist = -1
+                    elif dist == 0: continue
+                    elif dist > max_dists[chain_id]:
                         max_dists[chain_id] = dist
                     record = (label, dist, x, y, z)
                     records[chain_id].append(record)
                     old_coords = coords
+                    old_resid_id = resid_id
+                    old_atom_type = atom_type
         return records, max_dists
 
     def save_records(self):
