@@ -1,8 +1,14 @@
+import sys
 from collections import defaultdict
+
+try:
+    bgsu_csv_file = sys.argv[1]
+except:
+    bgsu_csv_file = 'bgsu_3269_4A.csv'
 
 pdb_chains_dict = defaultdict(list)
 classes = []
-with open('bgsu_3269_4A.csv', 'r') as f:
+with open(bgsu_csv_file, 'r') as f:
     for line in f.readlines():
         eq_class, representative, *_ = line.replace('"','').split(',')
         representative = representative.split('+')

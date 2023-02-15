@@ -14,8 +14,8 @@ def check_alexander(last_cif):
             else:
                 xyz_list.append(xyz)
     for xyz in tqdm(xyz_list):
-        res = alexander('xyz/{}'.format(xyz), closure=Closure.TWO_POINTS,
-                        tries=100, max_cross=60, run_parallel=False)
+        res = alexander('xyz/{}'.format(xyz), run_parallel=False,
+                        closure=Closure.TWO_POINTS, tries=100, max_cross=60, hide_rare=True)
         res = str(res).replace(' ','')[1:-1]
         with open('alexander.txt', 'a+') as f:
             f.write('{} {}\n'.format(xyz,res))
