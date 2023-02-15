@@ -6,15 +6,14 @@ def check_alexander(last_cif):
     xyz_list = []
     with open('lists/xyz_files.txt', 'r') as f:
         for i, line in enumerate(f.readlines()):
-            line_s = line.strip()
+            xyz = line.strip()
             #print('{:3d} {:16} {:16} {}'.format(i+1, last_cif, line_s, str(last_cif == line_s)))
             if last_cif:
-                if last_cif == line_s:
+                if last_cif == xyz:
                     last_cif = ''
             else:
-                xyz_list.append(line_s)
+                xyz_list.append(xyz)
     for xyz in tqdm(xyz_list):
-    #for xyz in xyz_list:
         res = alexander('xyz/{}'.format(xyz), closure=Closure.TWO_POINTS,
                         tries=100, max_cross=60, run_parallel=False)
         res = str(res).replace(' ','')[1:-1]

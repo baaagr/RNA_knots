@@ -3,6 +3,7 @@ import os
 from Bio.PDB.MMCIF2Dict import MMCIF2Dict
 from math import sqrt
 from tqdm import tqdm
+from collections import defaultdict
 
 class Analyze(object):
     corr_atoms = ["C5'","C4'","C3'","O3'","P","O5'"]
@@ -26,35 +27,40 @@ class Analyze(object):
         chain_id_l = self.mmcif_dict.get('_atom_site.auth_asym_id')
         resid_id_l = self.mmcif_dict.get('_atom_site.label_seq_id')
         atom_id_l = self.mmcif_dict.get('_atom_site.id')
+        alt_id_l = self.mmcif_dict.get('_atom_site.label_alt_id')
         x_l = self.mmcif_dict.get('_atom_site.Cartn_x')
         y_l = self.mmcif_dict.get('_atom_site.Cartn_y')
         z_l = self.mmcif_dict.get('_atom_site.Cartn_z')
         records = {}
         max_dists = {}
-        a = set()
-        for record_type, atom_type, chain_id, resid_id, atom_id, x, y, z in zip(
-            record_type_l, atom_type_l, chain_id_l, resid_id_l, atom_id_l, x_l, y_l, z_l):
-            if record_type == 'ATOM':
-                if chain_id in self.corr_chains and atom_type in Analyze.corr_atoms:
-                    if not chain_id in records.keys():
-                        records[chain_id] = []
-                        max_dists[chain_id] = 0
-                        old_coords = np.array([None, None, None])
-                        old_resid_id = None
-                        old_atom_type = None
-                    if (old_resid_id, old_atom_type) == (resid_id, atom_type): continue
-                    label = '-'.join([atom_id, chain_id, resid_id, atom_type])
-                    coords = np.array([float(k) for k in [x,y,z]])
-                    dist = self.calc_dist(coords, old_coords)
-                    if dist == None: dist = -1
-                    elif dist == 0: continue
-                    elif dist > max_dists[chain_id]:
-                        max_dists[chain_id] = dist
-                    record = (label, dist, x, y, z)
-                    records[chain_id].append(record)
-                    old_coords = coords
-                    old_resid_id = resid_id
-                    old_atom_type = atom_type
+        alt_id_corr = defaultdict(lambda: '.')
+        for record_type, atom_type, chain_id, alt_id, resid_id, atom_id, x, y, z in zip(
+            record_type_l, atom_type_l, chain_id_l, alt_id_l, resid_id_l, atom_id_l, x_l, y_l, z_l):
+#            if record_type == 'ATOM':
+            if chain_id in self.corr_chains and atom_type in Analyze.corr_atoms:
+                if alt_id not in alt_id_corr[chain_id]:
+                    if alt_id_corr[chain_id] == '.':
+                        alt_id_corr[chain_id] += alt_id
+                    else: continue
+                if not chain_id in records.keys():
+                    records[chain_id] = []
+                    max_dists[chain_id] = 0
+                    old_coords = np.array([None, None, None])
+                    old_resid_id = None
+                    old_atom_type = None
+                if (old_resid_id, old_atom_type) == (resid_id, atom_type): continue
+                label = '-'.join([atom_id, chain_id, resid_id, atom_type])
+                coords = np.array([float(k) for k in [x,y,z]])
+                dist = self.calc_dist(coords, old_coords)
+                if dist == None: dist = -1
+                elif dist == 0: continue
+                elif dist > max_dists[chain_id]:
+                    max_dists[chain_id] = dist
+                record = (label, dist, x, y, z)
+                records[chain_id].append(record)
+                old_coords = coords
+                old_resid_id = resid_id
+                old_atom_type = atom_type
         return records, max_dists
 
     def save_records(self):
