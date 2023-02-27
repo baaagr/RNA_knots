@@ -1,0 +1,14 @@
+2c=12.5 -- ognisko-ognisko
+2a=28 -- ognisko-brzeg-ognisko
+
+c= 6.25
+a= 14
+c2 = a2 - b2
+b2 = a2-c2
+b = sqrt(a2-c2) = 12.52
+
+2c = 16
+2a = 34
+c = 8
+a = 17
+b = 15
